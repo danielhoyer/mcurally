@@ -62,6 +62,19 @@ void handle(int angle);
 unsigned long cnt0;
 unsigned long cnt1;
 int pattern;
+int handle_buff;
+
+const int revolution_difference[] = {
+    100, 98, 97, 95, 93,
+    92, 90, 88, 87, 85,
+    84, 82, 81, 79, 78,
+    76, 75, 73, 72, 71,
+    69, 68, 66, 65, 64,
+    62, 61, 59, 58, 57,
+    55, 54, 52, 51, 50,
+    48, 47, 45, 44, 42,
+    41, 39, 38, 36, 35,
+    33 };
 
 /***********************************************************************/
 /* Main program                                                        */
@@ -158,63 +171,63 @@ void main(void) {
 
 			case 0x04:
 				/* Slight amount left of center -> slight turn to right */
-				handle(5);
+				handle(3);
 				motor(100, 100);
 				break;
 
 			case 0x06:
 				/* Small amount left of center -> small turn to right */
-				handle(15);
-				motor(85, 70);
+				handle(12);
+				motor(100, diff(100));
 				break;
 
 			case 0x07:
 				/* Medium amount left of center -> medium turn to right */
-				handle(20);
-				motor(70, 55);
+				handle(22);
+				motor(100, diff(100));
 				break;
 
 			case 0x03:
 				/* Large amount left of center -> large turn to right */
-				handle(25);
-				motor(55, 30);
+				handle(30);
+				motor(100, diff(100));
 				break;
 
 			case 0x01:
 				/* Large amount left of center -> large turn to right */
-				handle(30);
-				motor(55, 30);
+				handle(35);
+				motor(100, diff(100));
 				pattern = 12;
 				break;
 
 			case 0x20:
 				/* Slight amount right of center -> slight turn to left */
-				handle(-5);
+				handle(-3);
 				motor(100, 100);
 				break;
 
 			case 0x60:
 				/* Small amount right of center -> small turn to left */
-				handle(-15);
-				motor(70, 85);
+				handle(-12);
+				motor(diff(100), 100);
 				break;
 
 			case 0xe0:
 				/* Medium amount right of center -> medium turn to left */
-				handle(-20);
-				motor(55, 70);
+				handle(-22);
+				motor(diff(100), 100);
 				break;
 
 			case 0xc0:
 				/* Large amount right of center -> large turn to left */
-				handle(-25);
+				handle(-30);
 				motor(30, 55);
 				break;
 
 			case 0x80:
 				/* Large amount right of center -> large turn to left */
-				handle(-30);
-				motor(30, 55);
+				handle(-35);
+				motor(diff(100), 100);
 				pattern = 13;
 				break;
 
@@ -385,7 +398,7 @@ void main(void) {
 			/* Processing at 1st right half line detection */
 			led_out(0x2);
 			handle(0);
-			motor(0, 0);
+			motor(-10, -10);
 			pattern = 52;
 			cnt1 = 0;
 			break;
@@ -397,7 +410,7 @@ void main(void) {
 			 cnt1 = 0;
 			 }*/
 			led_out(0x0);
-			if (cnt1 > 100) {
+			if (cnt1 > 120) {
 				cnt1 = 0;
 			}
 			if (check_rightline()) {
@@ -458,7 +471,7 @@ void main(void) {
 			/* Processing at 1st left half line detection */
 			led_out(0x1);
 			handle(0);
-			motor(0, 0);
+			motor(-10, -10);
 			pattern = 62;
 			cnt1 = 0;
 			break;
@@ -470,7 +483,7 @@ void main(void) {
 			 cnt1 = 0;
 			 }*/
 			led_out(0x0);
-			if (cnt1 > 100) {
+			if (cnt1 > 120) {
 				cnt1 = 0;
 			}
 			if (check_leftline()) {
@@ -809,6 +822,19 @@ void motor(int accele_l, int accele_r) {
 void handle(int angle) {
 	/* When the servo move from left to right in reverse, replace "-" with "+". */MTU3.TGRD
 			= SERVO_CENTER - angle * HANDLE_STEP;
+	handle_buff = angle;
+}
+
+int diff( int pwm )
+{
+    int i, ret;
+
+    i  = handle_buff;
+    if( i <  0 ) i = -i;
+    if( i > 45 ) i = 45;
+    ret = revolution_difference[i] * pwm / 100;
+
+    return ret;
 }
 
 /***********************************************************************/
