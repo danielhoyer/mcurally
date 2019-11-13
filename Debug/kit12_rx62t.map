@@ -1,4 +1,4 @@
-Optimizing Linkage Editor (V.10.02.00.000)        13-Nov-2019 15:11:38
+Optimizing Linkage Editor (V.10.02.00.000)        13-Nov-2019 16:27:56
 
 *** Options ***
 
@@ -63,9 +63,9 @@ D_2
 D_1
                                   ffff8558  ffff8558         0   1
 P
-                                  ffff8558  ffff8f32       9db   4
+                                  ffff8558  ffff8f35       9de   4
 PIntPRG
-                                  ffff8f33  ffff8f43        11   1
+                                  ffff8f36  ffff8f43         e   1
 W_1
                                   ffff8f44  ffff8f44         0   4
 W_2

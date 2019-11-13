@@ -284,14 +284,14 @@ void main(void) {
 			/* Processing at 1st cross line */
 			led_out(0x3);
 			handle(0);
-			motor(0, 0);
+			motor(-10,-10);
 			pattern = 22;
 			cnt1 = 0;
 			break;
 
 		case 22:
 			/* Read but ignore 2nd line */
-			if (cnt1 > 50) {
+			if (cnt1 > 120) {
 				pattern = 23;
 				led_out(0x7);
 				cnt1 = 0;
@@ -306,7 +306,7 @@ void main(void) {
 				/* Left crank determined -> to left crank clearing processing */
 				led_out(0x1);
 				handle(-35);
-				motor(10, 40);
+				motor(-20, 70);
 				pattern = 31;
 				cnt1 = 0;
 				break;
@@ -317,7 +317,7 @@ void main(void) {
 				/* Right crank determined -> to right crank clearing processing */
 				led_out(0x2);
 				handle(35);
-				motor(40, 10);
+				motor(70, -20);
 				pattern = 41;
 				cnt1 = 0;
 				break;
