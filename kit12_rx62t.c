@@ -142,18 +142,10 @@ void main(void) {
 				break;
 			}
 			if (check_rightline()) {/* Right half line detection check */
-				if (check_leftline()) {
-					pattern = 21;
-					break;
-				}
 				pattern = 51;
 				break;
 			}
 			if (check_leftline()) {/* Left half line detection check */
-				if (check_rightline()) {
-					pattern = 21;
-					break;
-				}
 				pattern = 61;
 				break;
 			}
@@ -184,6 +176,12 @@ void main(void) {
 
 			case 0x03:
 				/* Large amount left of center -> large turn to right */
+				handle(25);
+				motor(55, 30);
+				break;
+
+			case 0x01:
+				/* Large amount left of center -> large turn to right */
 				handle(30);
 				motor(55, 30);
 				pattern = 12;
@@ -209,6 +207,12 @@ void main(void) {
 
 			case 0xc0:
 				/* Large amount right of center -> large turn to left */
+				handle(-25);
+				motor(30, 55);
+				break;
+
+			case 0x80:
+				/* Large amount right of center -> large turn to left */
 				handle(-30);
 				motor(30, 55);
 				pattern = 13;
@@ -226,18 +230,10 @@ void main(void) {
 				break;
 			}
 			if (check_rightline()) {/* Right half line detection check */
-				if (check_leftline()) {
-					pattern = 21;
-					break;
-				}
 				pattern = 51;
 				break;
 			}
 			if (check_leftline()) {/* Left half line detection check */
-				if (check_rightline()) {
-					pattern = 21;
-					break;
-				}
 				pattern = 61;
 				break;
 			}
@@ -250,9 +246,8 @@ void main(void) {
 			 } else if (sensor_inp(MASK3_3) == 0x01) {
 			 pattern = 11;
 			 }*/
-			if (sensor_inp(MASK3_3) != 0x01 && sensor_inp(MASK3_3) != 0x03
-					&& sensor_inp(MASK3_3) != 0x07 && sensor_inp(MASK3_3)
-					!= 0x06) {
+			if (sensor_inp(MASK0_3) != 0x01 && sensor_inp(MASK0_3) != 0x03
+					&& sensor_inp(MASK0_3) != 0x07 ) {
 				pattern = 11;
 			}
 			break;
@@ -264,18 +259,10 @@ void main(void) {
 				break;
 			}
 			if (check_rightline()) {/* Right half line detection check */
-				if (check_leftline()) {
-					pattern = 21;
-					break;
-				}
 				pattern = 51;
 				break;
 			}
 			if (check_leftline()) {/* Left half line detection check */
-				if (check_rightline()) {
-					pattern = 21;
-					break;
-				}
 				pattern = 61;
 				break;
 			}
@@ -286,14 +273,14 @@ void main(void) {
 			 } else if (sensor_inp(MASK3_3) == 0x70) {
 			 pattern = 11;
 			 } */
-			if (sensor_inp(MASK3_3) != 0x80 && sensor_inp(MASK3_3) != 0xc0
-					&& sensor_inp(MASK3_3) != 0xe0 && sensor_inp(MASK3_3)
-					!= 0x60) {
+			if (sensor_inp(MASK3_0) != 0x80 && sensor_inp(MASK3_0) != 0xc0
+					&& sensor_inp(MASK3_0) != 0xe0) {
 				pattern = 11;
 			}
 			break;
 
 		case 21:
+
 			/* Processing at 1st cross line */
 			led_out(0x3);
 			handle(0);
@@ -304,8 +291,9 @@ void main(void) {
 
 		case 22:
 			/* Read but ignore 2nd line */
-			if (cnt1 > 100) {
+			if (cnt1 > 50) {
 				pattern = 23;
+				led_out(0x7);
 				cnt1 = 0;
 			}
 			break;
@@ -338,7 +326,7 @@ void main(void) {
 			case 0x00:
 				/* Center -> straight */
 				handle(0);
-				motor(40, 40);
+				motor(35, 35);
 				break;
 			case 0x04:
 			case 0x06:
@@ -346,7 +334,7 @@ void main(void) {
 			case 0x03:
 				/* Left of center -> turn to right */
 				handle(8);
-				motor(40, 35);
+				motor(30, 25);
 				break;
 			case 0x20:
 			case 0x60:
@@ -354,7 +342,7 @@ void main(void) {
 			case 0xc0:
 				/* Right of center -> turn to left */
 				handle(-8);
-				motor(35, 40);
+				motor(25, 30);
 				break;
 			}
 			break;
@@ -404,9 +392,20 @@ void main(void) {
 
 		case 52:
 			/* Read but ignore 2nd time */
+			/*if (cnt1 > 100) {
+			 pattern = 53;
+			 cnt1 = 0;
+			 }*/
+			led_out(0x0);
 			if (cnt1 > 100) {
-				pattern = 53;
 				cnt1 = 0;
+			}
+			if (check_rightline()) {
+				pattern = 53;
+				led_out(0x1);
+			} else if (check_leftline()) {
+				pattern = 21;
+				led_out(0x3);
 			}
 			break;
 
@@ -466,9 +465,20 @@ void main(void) {
 
 		case 62:
 			/* Read but ignore 2nd time */
+			/*if (cnt1 > 100) {
+			 pattern = 63;
+			 cnt1 = 0;
+			 }*/
+			led_out(0x0);
 			if (cnt1 > 100) {
-				pattern = 63;
 				cnt1 = 0;
+			}
+			if (check_leftline()) {
+				pattern = 63;
+				led_out(0x1);
+			} else if (check_rightline()) {
+				pattern = 21;
+				led_out(0x3);
 			}
 			break;
 
