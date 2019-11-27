@@ -63,6 +63,7 @@ unsigned long cnt0;
 unsigned long cnt1;
 int pattern;
 int handle_buff;
+int crank_counter;
 
 const int revolution_difference[] = {
     100, 98, 97, 95, 93,
@@ -119,6 +120,7 @@ void main(void) {
 			if (pushsw_get()) {
 				pattern = 1;
 				cnt1 = 0;
+				crank_counter = 0;
 				break;
 			}
 			if (cnt1 < 100) { /* LED flashing processing     */
@@ -165,6 +167,12 @@ void main(void) {
 			switch (sensor_inp(MASK3_3)) {
 			case 0x00:
 				/* Center -> straight */
+				if(sensor_inp(MASK4_4)==0x00){
+					motor(0,0);
+					handle(0);
+					pattern = 0;
+					break;
+				}
 				handle(0);
 				motor(100, 100);
 				break;
@@ -304,7 +312,7 @@ void main(void) {
 
 		case 22:
 			/* Read but ignore 2nd line */
-			if (cnt1 > 120) {
+			if (cnt1 > 250) {
 				pattern = 23;
 				//led_out(0x7);
 				cnt1 = 0;
@@ -318,7 +326,7 @@ void main(void) {
 					== 0xf0) {
 				/* Left crank determined -> to left crank clearing processing */
 				//led_out(0x1);
-				handle(-35);
+				handle(-38);
 				motor(10, 70);
 				pattern = 31;
 				cnt1 = 0;
@@ -329,7 +337,7 @@ void main(void) {
 					== 0x0f) {
 				/* Right crank determined -> to right crank clearing processing */
 				//led_out(0x2);
-				handle(35);
+				handle(38);
 				motor(70, 10);
 				pattern = 41;
 				cnt1 = 0;
@@ -374,6 +382,7 @@ void main(void) {
 				//led_out(0x0);
 				pattern = 11;
 				cnt1 = 0;
+				crank_counter++;
 			}
 			break;
 
@@ -391,6 +400,7 @@ void main(void) {
 				//led_out(0x0);
 				pattern = 11;
 				cnt1 = 0;
+				crank_counter++;
 			}
 			break;
 
@@ -699,7 +709,7 @@ int check_rightline(void) {
 	int ret;
 
 	ret = 0;
-	b = sensor_inp(MASK0_3);
+	b = sensor_inp(MASK3_3);
 	if (b == 0x07) {
 		ret = 1;
 	}
@@ -715,7 +725,7 @@ int check_leftline(void) {
 	int ret;
 
 	ret = 0;
-	b = sensor_inp(MASK3_0);
+	b = sensor_inp(MASK3_3);
 	if (b == 0xe0) {
 		ret = 1;
 	}
