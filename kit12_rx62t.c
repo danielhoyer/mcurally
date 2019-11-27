@@ -183,19 +183,19 @@ void main(void) {
 
 			case 0x07:
 				/* Medium amount left of center -> medium turn to right */
-				handle(22);
+				handle(17);
 				motor(100, diff(100));
 				break;
 
 			case 0x03:
 				/* Large amount left of center -> large turn to right */
-				handle(30);
+				handle(25);
 				motor(100, diff(100));
 				break;
 
 			case 0x01:
 				/* Large amount left of center -> large turn to right */
-				handle(35);
+				handle(30);
 				motor(100, diff(100));
 				pattern = 12;
 				break;
@@ -214,19 +214,19 @@ void main(void) {
 
 			case 0xe0:
 				/* Medium amount right of center -> medium turn to left */
-				handle(-22);
+				handle(-17);
 				motor(diff(100), 100);
 				break;
 
 			case 0xc0:
 				/* Large amount right of center -> large turn to left */
-				handle(-30);
-				motor(30, 55);
+				handle(-25);
+				motor(diff(100), 100);
 				break;
 
 			case 0x80:
 				/* Large amount right of center -> large turn to left */
-				handle(-35);
+				handle(-30);
 				motor(diff(100), 100);
 				pattern = 13;
 				break;
@@ -319,7 +319,7 @@ void main(void) {
 				/* Left crank determined -> to left crank clearing processing */
 				led_out(0x1);
 				handle(-35);
-				motor(-20, 70);
+				motor(10, 70);
 				pattern = 31;
 				cnt1 = 0;
 				break;
@@ -330,7 +330,7 @@ void main(void) {
 				/* Right crank determined -> to right crank clearing processing */
 				led_out(0x2);
 				handle(35);
-				motor(70, -20);
+				motor(70, 10);
 				pattern = 41;
 				cnt1 = 0;
 				break;
