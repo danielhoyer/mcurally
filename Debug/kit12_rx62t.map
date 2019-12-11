@@ -1,4 +1,4 @@
-Optimizing Linkage Editor (V.10.02.00.000)        27-Nov-2019 16:47:25
+Optimizing Linkage Editor (V.10.02.00.000)        11-Dec-2019 16:54:26
 
 *** Options ***
 
@@ -35,13 +35,13 @@ B_2
 R_2
                                   00001000  00001000         0   2
 B
-                                  00001000  00001413       414   4
+                                  00001000  0000141f       420   4
 R
-                                  00001414  00001417         4   4
+                                  00001420  00001423         4   4
 SU
-                                  00001418  00001717       300   4
+                                  00001424  00001723       300   4
 SI
-                                  00001718  00001817       100   4
+                                  00001724  00001823       100   4
 PResetPRG
                                   ffff8000  ffff8033        34   4
 C_1
@@ -49,28 +49,28 @@ C_1
 C_2
                                   ffff8100  ffff8100         0   2
 C
-                                  ffff8100  ffff81cf        d0   4
+                                  ffff8100  ffff81ef        f0   4
 C$DSEC
-                                  ffff81d0  ffff81f3        24   4
+                                  ffff81f0  ffff8213        24   4
 C$BSEC
-                                  ffff81f4  ffff820b        18   4
+                                  ffff8214  ffff822b        18   4
 C$VECT
-                                  ffff820c  ffff860b       400   4
+                                  ffff822c  ffff862b       400   4
 D
-                                  ffff860c  ffff860f         4   4
+                                  ffff862c  ffff862f         4   4
 D_2
-                                  ffff8610  ffff8610         0   2
+                                  ffff8630  ffff8630         0   2
 D_1
-                                  ffff8610  ffff8610         0   1
+                                  ffff8630  ffff8630         0   1
 P
-                                  ffff8610  ffff903c       a2d   4
+                                  ffff8630  ffff9110       ae1   4
 PIntPRG
-                                  ffff903d  ffff904b         f   1
+                                  ffff9111  ffff911f         f   1
 W_1
-                                  ffff904c  ffff904c         0   4
+                                  ffff9120  ffff9120         0   4
 W_2
-                                  ffff904c  ffff904c         0   2
+                                  ffff9120  ffff9120         0   2
 W
-                                  ffff904c  ffff904c         0   4
+                                  ffff9120  ffff9120         0   4
 FIXEDVECT
                                   ffffffd0  ffffffff        30   4

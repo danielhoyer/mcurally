@@ -64,18 +64,19 @@ unsigned long cnt1;
 int pattern;
 int handle_buff;
 int crank_counter;
+int crank_amount;
+int laneswitch_counter;
+int laneswitch_amount;
 
-const int revolution_difference[] = {
-    100, 98, 97, 95, 93,
-    92, 90, 88, 87, 85,
-    84, 82, 81, 79, 78,
-    76, 75, 73, 72, 71,
-    69, 68, 66, 65, 64,
-    62, 61, 59, 58, 57,
-    55, 54, 52, 51, 50,
-    48, 47, 45, 44, 42,
-    41, 39, 38, 36, 35,
-    33 };
+const int revolution_difference[] =
+		{ 100, 98, 97, 95, 93, 92, 90, 88, 87, 85, 84, 82, 81, 79, 78, 76, 75,
+				73, 72, 71, 69, 68, 66, 65, 64, 62, 61, 59, 58, 57, 55, 54, 52,
+				51, 50, 48, 47, 45, 44, 42, 41, 39, 38, 36, 35, 33 };
+
+//länger warten / bremsen, je näher an kurve
+const int crank_difference[] = { 100, 200, 100, 100, 100, 100 };
+
+const int laneswitch_difference[] = { 175, 175 };
 
 /***********************************************************************/
 /* Main program                                                        */
@@ -87,6 +88,12 @@ void main(void) {
 	/* Initialize micom car state */
 	handle(0);
 	motor(0, 0);
+
+	crank_counter = 0;
+	crank_amount = 6;
+
+	laneswitch_counter = 0;
+	laneswitch_amount = 2;
 
 	while (1) {
 		switch (pattern) {
@@ -120,7 +127,7 @@ void main(void) {
 			if (pushsw_get()) {
 				pattern = 1;
 				cnt1 = 0;
-				crank_counter = 0;
+
 				break;
 			}
 			if (cnt1 < 100) { /* LED flashing processing     */
@@ -167,8 +174,8 @@ void main(void) {
 			switch (sensor_inp(MASK3_3)) {
 			case 0x00:
 				/* Center -> straight */
-				if(sensor_inp(MASK4_4)==0x00){
-					motor(0,0);
+				if (sensor_inp(MASK4_4) == 0x00) {
+					motor(0, 0);
 					handle(0);
 					pattern = 0;
 					break;
@@ -179,63 +186,63 @@ void main(void) {
 
 			case 0x04:
 				/* Slight amount left of center -> slight turn to right */
-				handle(3);
+				handle(11);
 				motor(100, 100);
 				break;
 
 			case 0x06:
 				/* Small amount left of center -> small turn to right */
-				handle(12);
+				handle(23);
 				motor(100, diff(100));
 				break;
 
 			case 0x07:
 				/* Medium amount left of center -> medium turn to right */
-				handle(17);
-				motor(100, diff(100));
+				handle(29);
+				motor(95, diff(95));
 				break;
 
 			case 0x03:
 				/* Large amount left of center -> large turn to right */
-				handle(25);
-				motor(100, diff(100));
+				handle(34);
+				motor(85, diff(85));
 				break;
 
 			case 0x01:
 				/* Large amount left of center -> large turn to right */
-				handle(30);
-				motor(100, diff(100));
+				handle(45);
+				motor(75, diff(75));
 				pattern = 12;
 				break;
 
 			case 0x20:
 				/* Slight amount right of center -> slight turn to left */
-				handle(-3);
+				handle(-11);
 				motor(100, 100);
 				break;
 
 			case 0x60:
 				/* Small amount right of center -> small turn to left */
-				handle(-12);
+				handle(-23);
 				motor(diff(100), 100);
 				break;
 
 			case 0xe0:
 				/* Medium amount right of center -> medium turn to left */
-				handle(-17);
-				motor(diff(100), 100);
+				handle(-29);
+				motor(diff(95), 95);
 				break;
 
 			case 0xc0:
 				/* Large amount right of center -> large turn to left */
-				handle(-25);
-				motor(diff(100), 100);
+				handle(-34);
+				motor(diff(85), 85);
 				break;
 
 			case 0x80:
 				/* Large amount right of center -> large turn to left */
-				handle(-30);
-				motor(diff(100), 100);
+				handle(-45);
+				motor(diff(75), 75);
 				pattern = 13;
 				break;
 
@@ -268,7 +275,7 @@ void main(void) {
 			 pattern = 11;
 			 }*/
 			if (sensor_inp(MASK0_3) != 0x01 && sensor_inp(MASK0_3) != 0x03
-					&& sensor_inp(MASK0_3) != 0x07 ) {
+					&& sensor_inp(MASK0_3) != 0x07) {
 				pattern = 11;
 			}
 			break;
@@ -305,14 +312,14 @@ void main(void) {
 			/* Processing at 1st cross line */
 			//led_out(0x3);
 			handle(0);
-			motor(-10,-10);
+			motor(-10, -10);
 			pattern = 22;
 			cnt1 = 0;
 			break;
 
 		case 22:
 			/* Read but ignore 2nd line */
-			if (cnt1 > 250) {
+			if (cnt1 > calculateWait()) {
 				pattern = 23;
 				//led_out(0x7);
 				cnt1 = 0;
@@ -326,7 +333,7 @@ void main(void) {
 					== 0xf0) {
 				/* Left crank determined -> to left crank clearing processing */
 				//led_out(0x1);
-				handle(-38);
+				handle(-43);
 				motor(10, 70);
 				pattern = 31;
 				cnt1 = 0;
@@ -337,7 +344,7 @@ void main(void) {
 					== 0x0f) {
 				/* Right crank determined -> to right crank clearing processing */
 				//led_out(0x2);
-				handle(38);
+				handle(43);
 				motor(70, 10);
 				pattern = 41;
 				cnt1 = 0;
@@ -347,7 +354,7 @@ void main(void) {
 			case 0x00:
 				/* Center -> straight */
 				handle(0);
-				motor(35, 35);
+				motor(20, 20);
 				break;
 			case 0x04:
 			case 0x06:
@@ -355,7 +362,7 @@ void main(void) {
 			case 0x03:
 				/* Left of center -> turn to right */
 				handle(8);
-				motor(30, 25);
+				motor(20, 10);
 				break;
 			case 0x20:
 			case 0x60:
@@ -363,7 +370,7 @@ void main(void) {
 			case 0xc0:
 				/* Right of center -> turn to left */
 				handle(-8);
-				motor(25, 30);
+				motor(10, 20);
 				break;
 			}
 			break;
@@ -420,7 +427,7 @@ void main(void) {
 			 cnt1 = 0;
 			 }*/
 			led_out(0x0);
-			if (cnt1 > 120) {
+			if (cnt1 > calculateLaneSwitchWait()) {
 				cnt1 = 0;
 			}
 			if (check_rightline()) {
@@ -470,11 +477,12 @@ void main(void) {
 
 		case 54:
 			/* Right lane change end check */
-			if (sensor_inp(MASK4_4) == 0x06 || sensor_inp(MASK4_4) == 0x0c ||
-					sensor_inp(MASK4_4) == 0x0e ) {
+			if (sensor_inp(MASK4_4) == 0x06 || sensor_inp(MASK4_4) == 0x0c
+					|| sensor_inp(MASK4_4) == 0x0e) {
 				led_out(0x0);
 				pattern = 11;
 				cnt1 = 0;
+				laneswitch_counter++;
 			}
 			break;
 
@@ -494,7 +502,7 @@ void main(void) {
 			 cnt1 = 0;
 			 }*/
 			led_out(0x0);
-			if (cnt1 > 120) {
+			if (cnt1 > calculateLaneSwitchWait()) {
 				cnt1 = 0;
 			}
 			if (check_leftline()) {
@@ -544,9 +552,10 @@ void main(void) {
 
 		case 64:
 			/* Left lane change end check */
-			if (sensor_inp(MASK4_4) == 0x30 || sensor_inp(MASK4_4) == 0x60 ||
-					sensor_inp(MASK4_4) == 0x70) {
+			if (sensor_inp(MASK4_4) == 0x30 || sensor_inp(MASK4_4) == 0x60
+					|| sensor_inp(MASK4_4) == 0x70) {
 				led_out(0x0);
+				laneswitch_counter++;
 				pattern = 11;
 				cnt1 = 0;
 			}
@@ -558,6 +567,16 @@ void main(void) {
 			break;
 		}
 	}
+}
+
+int calculateWait() {
+	int crank_no = crank_counter % crank_amount;
+	return crank_difference[crank_no];
+}
+
+int calculateLaneSwitchWait() {
+	int laneswitch_no = laneswitch_counter % laneswitch_amount;
+	return laneswitch_difference[laneswitch_no];
 }
 
 /***********************************************************************/
@@ -837,16 +856,17 @@ void handle(int angle) {
 	handle_buff = angle;
 }
 
-int diff( int pwm )
-{
-    int i, ret;
+int diff(int pwm) {
+	int i, ret;
 
-    i  = handle_buff;
-    if( i <  0 ) i = -i;
-    if( i > 45 ) i = 45;
-    ret = revolution_difference[i] * pwm / 100;
+	i = handle_buff;
+	if (i < 0)
+		i = -i;
+	if (i > 45)
+		i = 45;
+	ret = revolution_difference[i] * pwm / 100;
 
-    return ret;
+	return ret;
 }
 
 /***********************************************************************/
