@@ -67,14 +67,18 @@ int crank_counter;
 int crank_amount;
 int laneswitch_counter;
 int laneswitch_amount;
+int event_counter;
+int event_amount;
 
 const int revolution_difference[] =
 		{ 100, 98, 97, 95, 93, 92, 90, 88, 87, 85, 84, 82, 81, 79, 78, 76, 75,
 				73, 72, 71, 69, 68, 66, 65, 64, 62, 61, 59, 58, 57, 55, 54, 52,
 				51, 50, 48, 47, 45, 44, 42, 41, 39, 38, 36, 35, 33 };
 
+const int event_difference[] = {21, 21, 51, 61};
+
 //länger warten / bremsen, je näher an kurve
-const int crank_difference[] = { 100, 200, 100, 100, 100, 100 };
+const int crank_difference[] = { 100, 200 };
 
 const int laneswitch_difference[] = { 175, 175 };
 
@@ -90,10 +94,13 @@ void main(void) {
 	motor(0, 0);
 
 	crank_counter = 0;
-	crank_amount = 6;
+	crank_amount = 2;
 
 	laneswitch_counter = 0;
-	laneswitch_amount = 2;
+	laneswitch_amount = 1;
+
+	event_counter = 0;
+	event_amount = 4;
 
 	while (1) {
 		switch (pattern) {
@@ -160,15 +167,15 @@ void main(void) {
 		case 11:
 			/* Normal trace */
 			if (check_crossline()) { /* Cross line check            */
-				pattern = 21;
+				pattern = 14;
 				break;
 			}
 			if (check_rightline()) {/* Right half line detection check */
-				pattern = 51;
+				pattern = 14;
 				break;
 			}
 			if (check_leftline()) {/* Left half line detection check */
-				pattern = 61;
+				pattern = 14;
 				break;
 			}
 			switch (sensor_inp(MASK3_3)) {
@@ -307,6 +314,11 @@ void main(void) {
 			}
 			break;
 
+		case 14:
+
+			pattern = event_difference[event_counter % event_amount];
+			break;
+
 		case 21:
 
 			/* Processing at 1st cross line */
@@ -328,9 +340,7 @@ void main(void) {
 
 		case 23:
 			/* Trace, crank detection after cross line */
-			if (sensor_inp(MASK4_4) == 0xf8 || sensor_inp(MASK4_4) == 0xfe
-					|| sensor_inp(MASK4_4) == 0xfc || sensor_inp(MASK4_4)
-					== 0xf0) {
+			if (sensor_inp(MASK3_0) == 0xe0) {
 				/* Left crank determined -> to left crank clearing processing */
 				//led_out(0x1);
 				handle(-43);
@@ -339,9 +349,7 @@ void main(void) {
 				cnt1 = 0;
 				break;
 			}
-			if (sensor_inp(MASK4_4) == 0x1f || sensor_inp(MASK4_4) == 0x3f
-					|| sensor_inp(MASK4_4) == 0x7f || sensor_inp(MASK4_4)
-					== 0x0f) {
+			if (sensor_inp(MASK0_3) == 0x07) {
 				/* Right crank determined -> to right crank clearing processing */
 				//led_out(0x2);
 				handle(43);
@@ -390,6 +398,7 @@ void main(void) {
 				pattern = 11;
 				cnt1 = 0;
 				crank_counter++;
+				event_counter++;
 			}
 			break;
 
@@ -408,6 +417,7 @@ void main(void) {
 				pattern = 11;
 				cnt1 = 0;
 				crank_counter++;
+				event_counter++;
 			}
 			break;
 
@@ -429,17 +439,15 @@ void main(void) {
 			led_out(0x0);
 			if (cnt1 > calculateLaneSwitchWait()) {
 				cnt1 = 0;
-			}
-			if (check_rightline()) {
 				pattern = 53;
-				led_out(0x1);
-			} else if (check_leftline()) {
-				pattern = 21;
-				led_out(0x3);
 			}
+
 			break;
 
 		case 53:
+			//if (cnt1 > calculateLaneSwitchWait()) {
+			//	cnt1 = 0;
+			//}
 			/* Trace, lane change after right half line detection */
 			if (sensor_inp(MASK4_4) == 0x00) {
 				handle(20);
@@ -483,6 +491,7 @@ void main(void) {
 				pattern = 11;
 				cnt1 = 0;
 				laneswitch_counter++;
+				event_counter++;
 			}
 			break;
 
@@ -504,14 +513,15 @@ void main(void) {
 			led_out(0x0);
 			if (cnt1 > calculateLaneSwitchWait()) {
 				cnt1 = 0;
-			}
-			if (check_leftline()) {
 				pattern = 63;
-				led_out(0x1);
-			} else if (check_rightline()) {
-				pattern = 21;
-				led_out(0x3);
 			}
+			//if (check_leftline()) {
+				//pattern = 63;
+				//led_out(0x1);
+			//} else if (check_rightline()) {
+				//pattern = 21;
+			//	led_out(0x3);
+			//}
 			break;
 
 		case 63:
@@ -556,6 +566,7 @@ void main(void) {
 					|| sensor_inp(MASK4_4) == 0x70) {
 				led_out(0x0);
 				laneswitch_counter++;
+				event_counter++;
 				pattern = 11;
 				cnt1 = 0;
 			}
