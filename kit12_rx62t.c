@@ -37,6 +37,7 @@
 #define MASK4_0         0xf0            /* O O O O  X X X X            */
 #define MASK0_4         0x0f            /* X X X X  O O O O            */
 #define MASK4_4         0xff            /* O O O O  O O O O            */
+#define MASK_MIDDLE		0x18			/* X X X O  O X X X 		   */
 
 /*======================================*/
 /* Prototype declarations               */
@@ -82,8 +83,8 @@ const int event_difference[] = {21, 21, 21, 21, 21, 51, 61, 21};
 //70, 60, 40
 //const int crank_difference[] = { 100, 200, 350 };
 
-const int crank_difference[] = {250, 300, 200, 200, 250, 200};
-const int laneswitch_difference[] = { 175, 175 };
+const int crank_difference[] = {250, 300, 200, 300, 300, 200};
+const int laneswitch_difference[] = { 200, 200 };
 
 /***********************************************************************/
 /* Main program                                                        */
@@ -186,13 +187,19 @@ void main(void) {
 			switch (sensor_inp(MASK3_3)) {
 			case 0x00:
 				/* Center -> straight */
-				if (sensor_inp(MASK4_4) == 0x00) {
+				/*if (sensor_inp(MASK4_4) == 0x00) {
 					motor(0, 0);
 					handle(0);
 					pattern = 0;
 					break;
-				}
+				}*/
 				handle(0);
+				if(event_counter > 0){
+					if((event_counter % event_amount) == 0){
+						motor(40, 40);
+						break;
+					}
+				}
 				motor(90, 90);
 				break;
 
@@ -456,7 +463,7 @@ void main(void) {
 			/* Trace, lane change after right half line detection */
 			if (sensor_inp(MASK4_4) == 0x00) {
 				handle(20);
-				motor(40, 31);
+				motor(50, 35);
 				pattern = 54;
 				cnt1 = 0;
 				break;
@@ -465,7 +472,7 @@ void main(void) {
 			case 0x00:
 				/* Center -> straight */
 				handle(0);
-				motor(40, 40);
+				motor(50, 50);
 				break;
 			case 0x04:
 			case 0x06:
@@ -490,8 +497,9 @@ void main(void) {
 
 		case 54:
 			/* Right lane change end check */
-			if (sensor_inp(MASK4_4) == 0x06 || sensor_inp(MASK4_4) == 0x0c
-					|| sensor_inp(MASK4_4) == 0x0e) {
+			//if (sensor_inp(MASK0_4) == 0x06 || sensor_inp(MASK0_4) == 0x0c
+				//	|| sensor_inp(MASK0_4) == 0x0e || sensor_inp(MASK0_4) == 0x07) {
+			if(sensor_inp(MASK_MIDDLE) == 0x18){
 				led_out(0x0);
 				pattern = 11;
 				cnt1 = 0;
@@ -504,7 +512,7 @@ void main(void) {
 			/* Processing at 1st left half line detection */
 			led_out(0x1);
 			handle(0);
-			motor(-10, -10);
+			motor(0, 0);
 			pattern = 62;
 			cnt1 = 0;
 			break;
@@ -533,7 +541,7 @@ void main(void) {
 			/* Trace, lane change after left half line detection */
 			if (sensor_inp(MASK4_4) == 0x00) {
 				handle(-20);
-				motor(31, 40);
+				motor(35, 50);
 				pattern = 64;
 				cnt1 = 0;
 				break;
@@ -542,7 +550,7 @@ void main(void) {
 			case 0x00:
 				/* Center -> straight */
 				handle(0);
-				motor(40, 40);
+				motor(50, 50);
 				break;
 			case 0x04:
 			case 0x06:
@@ -567,8 +575,9 @@ void main(void) {
 
 		case 64:
 			/* Left lane change end check */
-			if (sensor_inp(MASK4_4) == 0x30 || sensor_inp(MASK4_4) == 0x60
-					|| sensor_inp(MASK4_4) == 0x70) {
+			/*if (sensor_inp(MASK4_0) == 0x30 || sensor_inp(MASK4_0) == 0x60
+					|| sensor_inp(MASK4_0) == 0x70 || sensor_inp(MASK4_0) == 0xe0) { */
+			if(sensor_inp(MASK_MIDDLE) == 0x18){
 				led_out(0x0);
 				laneswitch_counter++;
 				event_counter++;
