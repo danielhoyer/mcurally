@@ -1,4 +1,4 @@
-Optimizing Linkage Editor (V.10.02.00.000)        18-Dec-2019 17:26:53
+Optimizing Linkage Editor (V.10.02.00.000)        22-Jan-2020 15:06:45
 
 *** Options ***
 
@@ -49,28 +49,28 @@ C_1
 C_2
                                   ffff8100  ffff8100         0   2
 C
-                                  ffff8100  ffff81ef        f0   4
+                                  ffff8100  ffff820f       110   4
 C$DSEC
-                                  ffff81f0  ffff8213        24   4
+                                  ffff8210  ffff8233        24   4
 C$BSEC
-                                  ffff8214  ffff822b        18   4
+                                  ffff8234  ffff824b        18   4
 C$VECT
-                                  ffff822c  ffff862b       400   4
+                                  ffff824c  ffff864b       400   4
 D
-                                  ffff862c  ffff862f         4   4
+                                  ffff864c  ffff864f         4   4
 D_2
-                                  ffff8630  ffff8630         0   2
+                                  ffff8650  ffff8650         0   2
 D_1
-                                  ffff8630  ffff8630         0   1
+                                  ffff8650  ffff8650         0   1
 P
-                                  ffff8630  ffff9107       ad8   4
+                                  ffff8650  ffff9117       ac8   4
 PIntPRG
-                                  ffff9108  ffff9117        10   1
+                                  ffff9118  ffff9127        10   1
 W_1
-                                  ffff9118  ffff9118         0   4
+                                  ffff9128  ffff9128         0   4
 W_2
-                                  ffff9118  ffff9118         0   2
+                                  ffff9128  ffff9128         0   2
 W
-                                  ffff9118  ffff9118         0   4
+                                  ffff9128  ffff9128         0   4
 FIXEDVECT
                                   ffffffd0  ffffffff        30   4
