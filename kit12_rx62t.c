@@ -71,6 +71,7 @@ int laneswitch_amount;
 int event_counter;
 int event_amount;
 double engine_power;
+double engine_default;
 
 const int revolution_difference[] =
 		{ 100, 98, 97, 95, 93, 92, 90, 88, 87, 85, 84, 82, 81, 79, 78, 76, 75,
@@ -84,7 +85,7 @@ const int event_difference[] = { 21, 21, 21, 21, 21, 51, 61, 21 };
 //70, 60, 40
 //const int crank_difference[] = { 100, 200, 350 };
 
-const int crank_difference[] = { 250, 300, 200, 300, 300, 200 };
+const int crank_difference[] = { 350, 400, 250, 350, 400, 400 };
 const int laneswitch_difference[] = { 200, 200 };
 
 /***********************************************************************/
@@ -98,7 +99,8 @@ void main(void) {
 	handle(0);
 	motor(0, 0);
 
-	engine_power = 0.70;
+	engine_default = 0.9;
+	engine_power = engine_default;
 
 	crank_counter = 0;
 	//crank_amount = 3;
@@ -191,13 +193,42 @@ void main(void) {
 
 			if (event_counter > 0) {
 				if ((event_counter % event_amount) == 0) {
-					if (cnt1 > 6000 && cnt1 < 8000) {
+					if (cnt1 > 3500 && cnt1 < 5500) {
 						engine_power = 0.5;
 					} else {
-						engine_power = 0.7;
+						engine_power = engine_default;
 					}
 
 				}
+			}
+
+			if ((event_counter % event_amount) == 1) {
+				if (cnt1 > 4000 && cnt1 < 7500) {
+					engine_power = 0.7;
+				} else {
+					engine_power = engine_default;
+				}
+
+			}
+
+			if ((event_counter % event_amount) == 3) {
+				engine_power = 0.8;
+
+			}
+
+			if ((event_counter % event_amount) == 5) {
+				if (cnt1 > 2500 && cnt1 < 8000) {
+					engine_power = 0.7;
+				} else {
+					engine_power = engine_default;
+				}
+
+			}
+			if ((event_counter % event_amount) == 6) {
+				engine_power = 0.75;
+			}
+			if ((event_counter % event_amount) == 7) {
+				engine_power = engine_default;
 			}
 
 			switch (sensor_inp(MASK3_3)) {
@@ -344,11 +375,14 @@ void main(void) {
 			break;
 
 		case 21:
-
+			if ((event_counter % event_amount) == 7 ||
+					(event_counter % event_amount) == 2) {
+				motor(-10, -10);
+			} else {
+				motor(0, 0);
+			}
 			/* Processing at 1st cross line */
 			//led_out(0x3);
-			handle(0);
-			motor(0, 0);
 			pattern = 22;
 			cnt1 = 0;
 			break;
@@ -359,6 +393,26 @@ void main(void) {
 				pattern = 23;
 				//led_out(0x7);
 				cnt1 = 0;
+			}
+			switch (sensor_inp(MASK3_3)) {
+			case 0x00:
+				/* Center -> straight */
+				handle(0);
+				break;
+			case 0x04:
+			case 0x06:
+			case 0x07:
+			case 0x03:
+				/* Left of center -> turn to right */
+				handle(4);
+				break;
+			case 0x20:
+			case 0x60:
+			case 0xe0:
+			case 0xc0:
+				/* Right of center -> turn to left */
+				handle(-4);
+				break;
 			}
 			break;
 
