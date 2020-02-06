@@ -99,7 +99,7 @@ void main(void) {
 	handle(0);
 	motor(0, 0);
 
-	engine_default = 0.9;
+	engine_default = 0.85;
 	engine_power = engine_default;
 
 	crank_counter = 0;
@@ -193,7 +193,7 @@ void main(void) {
 
 			if (event_counter > 0) {
 				if ((event_counter % event_amount) == 0) {
-					if (cnt1 > 3500 && cnt1 < 5500) {
+					if (cnt1 > 4000 && cnt1 < 6500) {
 						engine_power = 0.5;
 					} else {
 						engine_power = engine_default;
